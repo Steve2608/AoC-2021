@@ -1,7 +1,5 @@
 import java.io.File
 
-fun File.readData() = this.readLines().map { Integer.parseInt(it) }.toIntArray()
-
 fun nIncrease(data: IntArray): Int = nIncrease(data, window_size = 1)
 
 fun nIncrease(data: IntArray, window_size: Int = 3): Int {
@@ -18,6 +16,8 @@ fun nIncrease(data: IntArray, window_size: Int = 3): Int {
 }
 
 fun main() {
+	fun File.readData() = this.readLines().map { Integer.parseInt(it) }.toIntArray()
+
 	val example: IntArray = File("example.txt").readData()
 	assert(7 == nIncrease(example)) { "Expected 7 increases" }
 	assert(5 == nIncrease(example, window_size = 3)) { "Expected 5 increases" }
