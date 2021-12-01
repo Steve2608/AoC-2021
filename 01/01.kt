@@ -1,6 +1,6 @@
 import java.io.File
 
-fun File.readData() = this.readLines().map { s -> Integer.parseInt(s) }.toIntArray()
+fun File.readData() = this.readLines().map { Integer.parseInt(it) }.toIntArray()
 
 fun nIncrease(data: IntArray): Int = nIncrease(data, window_size = 1)
 
