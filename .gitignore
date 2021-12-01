@@ -1,0 +1,24 @@
+# IDEs
+.idea/
+.vscode/
+
+### JAVA ###
+
+# kotlin library
+lib/
+
+# compiled results
+out/
+*.class
+*META-INF*
+
+### PYTHON ###
+
+*__pycache__*
+*.pyc
+*.pyo
+
+### AoC ###
+
+*input.txt
+*example.txt
