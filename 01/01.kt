@@ -1,8 +1,8 @@
 import java.io.File
 
-fun nIncrease(data: IntArray): Int = nIncrease(data, window_size = 1)
+private fun nIncrease(data: IntArray): Int = nIncrease(data, window_size = 1)
 
-fun nIncrease(data: IntArray, window_size: Int = 3): Int {
+private fun nIncrease(data: IntArray, window_size: Int = 3): Int {
 	var nIncrease = 0
 
 	var prev = data.slice(0 until window_size).sum()

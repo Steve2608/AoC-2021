@@ -1,7 +1,7 @@
 import java.io.File
 import kotlin.math.abs
 
-data class Direction(val direction: String, val length: Int) {
+private data class Direction(val direction: String, val length: Int) {
 	fun toVec2(): Vec2 = when (direction) {
 		"forward" -> Vec2(length, 0)
 		"down" -> Vec2(0, length)
@@ -17,20 +17,20 @@ data class Direction(val direction: String, val length: Int) {
 	}
 }
 
-data class Vec2(val x: Int, val y: Int) {
+private data class Vec2(val x: Int, val y: Int) {
 	operator fun plus(other: Vec2) = Vec2(x + other.x, y + other.y)
 }
 
-data class Vec3(val x: Int, val y: Int, val aim: Int) {
+private data class Vec3(val x: Int, val y: Int, val aim: Int) {
 	operator fun plus(other: Vec3) = Vec3(x + other.x, y + other.x * aim, aim + other.aim)
 }
 
-fun part1(directions: Array<Direction>): Int {
+private fun part1(directions: Array<Direction>): Int {
 	val pos = directions.map { it.toVec2() }.reduce { acc, vec2 -> acc + vec2 }
 	return abs(pos.x) * abs(pos.y)
 }
 
-fun part2(directions: Array<Direction>): Int {
+private fun part2(directions: Array<Direction>): Int {
 	val pos = directions.map { it.toVec3() }.reduce { acc, vec3 -> acc + vec3 }
 	return abs(pos.x) * abs(pos.y)
 }
