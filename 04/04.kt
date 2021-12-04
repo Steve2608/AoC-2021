@@ -12,18 +12,6 @@ private class Bingo(board: List<String>) {
 		marked = Array(board.size) { i -> getLine(board, i).map { false }.toBooleanArray() }
 	}
 
-	override fun toString(): String =
-		numbers.joinToString(separator = "\n") { it.joinToString(separator = " ") { num -> "%02d".format(num) } } + "\n" +
-			marked.joinToString(separator = "\n") { it.joinToString(separator = " ") { mark -> if (mark) "XX" else "__" } }
-
-	fun callNumber(number: Int) {
-		numbers.forEachIndexed { i, a ->
-			val index = a.indexOf(number)
-			if (index >= 0) marked[i][index] = true
-		}
-		calledNumbers.add(number)
-	}
-
 	val hasWinner: Boolean
 		get() {
 			if (marked.any { array -> array.all { it } }) return true
@@ -43,6 +31,18 @@ private class Bingo(board: List<String>) {
 			}
 			return sum * calledNumbers.last()
 		}
+
+	fun callNumber(number: Int) {
+		numbers.forEachIndexed { i, a ->
+			val index = a.indexOf(number)
+			if (index >= 0) marked[i][index] = true
+		}
+		calledNumbers.add(number)
+	}
+
+	override fun toString(): String =
+		numbers.joinToString(separator = "\n") { it.joinToString(separator = " ") { num -> "%02d".format(num) } } + "\n" +
+			marked.joinToString(separator = "\n") { it.joinToString(separator = " ") { mark -> if (mark) "XX" else "__" } }
 
 }
 

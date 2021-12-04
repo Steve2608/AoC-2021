@@ -3,6 +3,7 @@ import java.io.File
 private class Diagnostics(val data: Array<String>) {
 	val lastIndex: Int
 		get() = data[0].lastIndex
+
 	private val andBitMask: Int
 		get() = (1 shl (lastIndex + 1)) - 1
 
@@ -12,6 +13,7 @@ private class Diagnostics(val data: Array<String>) {
 			data.forEach { it.forEachIndexed { i, _ -> counts[i] = countBitPosition(data, i) } }
 			return counts.map { it >= data.size / 2 }.joinToString(separator = "") { if (it) "1" else "0" }.toInt(2)
 		}
+
 	val epsilon: Int
 		get() = (gamma xor Int.MAX_VALUE) and andBitMask
 
@@ -26,6 +28,7 @@ private class Diagnostics(val data: Array<String>) {
 			}
 			return null
 		}
+
 	val co2: Int?
 		get() {
 			var filterData = data.toList()
