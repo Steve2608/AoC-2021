@@ -12,19 +12,9 @@ private class Bingo(board: List<String>) {
 		marked = Array(board.size) { i -> getLine(board, i).map { false }.toBooleanArray() }
 	}
 
-	override fun toString(): String {
-		val n = numbers.joinToString(separator = "\n") {
-			it.joinToString(separator = " ") { num ->
-				String.format(
-					"%02d",
-					num
-				)
-			}
-		}
-		val b =
+	override fun toString(): String =
+		numbers.joinToString(separator = "\n") { it.joinToString(separator = " ") { num -> "%02d".format(num) } } + "\n" +
 			marked.joinToString(separator = "\n") { it.joinToString(separator = " ") { mark -> if (mark) "XX" else "__" } }
-		return n + "\n" + b
-	}
 
 	fun callNumber(number: Int) {
 		numbers.forEachIndexed { i, a ->
@@ -36,18 +26,9 @@ private class Bingo(board: List<String>) {
 
 	val hasWinner: Boolean
 		get() {
-			for (booleans in marked) {
-				if (booleans.all { it }) return true
-			}
+			if (marked.any { array -> array.all { it } }) return true
 			for (i in 0..marked.lastIndex) {
-				var column = true
-				for (booleans in marked) {
-					if (!booleans[i]) {
-						column = false
-						break
-					}
-				}
-				if (column) return true
+				if (marked.all { it[i] }) return true
 			}
 			return false
 		}
@@ -82,7 +63,7 @@ private fun part2(filename: String): Int {
 	var curr = mutableListOf<Bingo>()
 
 	numbers.forEach {
-		prev.forEachIndexed { i, board ->
+		prev.forEach { board ->
 			board.callNumber(it)
 			if (board.hasWinner) {
 				if (prev.size == 1) return board.winningScore
