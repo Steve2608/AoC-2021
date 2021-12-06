@@ -9,7 +9,7 @@ private class Ocean(val diagonals: Boolean) {
 		get() = counts.values.filter { it >= 2 }.size
 
 	private fun addPoint(point: Point) {
-		counts[point] = counts.getOrElse(point) { 0 } + 1
+		counts[point] = counts.getOrDefault(point, 0) + 1
 	}
 
 	fun expandPoints(start: Point, end: Point) {
