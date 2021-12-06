@@ -1,18 +1,18 @@
-from collections import Counter, deque
+from collections import Counter
+# from time import perf_counter_ns
+
+from sim import simulate_pop
 
 if __name__ == '__main__':
-    def simulate_pop(pop: deque, days: int):
-        pop_iter = pop.copy()
-        for day in range(days):
-            p = pop_iter.popleft()
-            pop_iter[6] += p
-            pop_iter.append(p)
-        return sum(pop_iter), pop_iter
-
+    # t1 = perf_counter_ns()
     with open('input.txt') as in_file:
         counts = Counter(map(int, in_file.read().strip().split(',')))
 
-    pop0 = deque([counts[i] for i in range(9)])
-    part1, pop80 = simulate_pop(pop0, days=80)
-    part2, pop256 = simulate_pop(pop80, days=256 - 80)
+    pop = [counts[i] for i in range(9)]
+    # t2 = perf_counter_ns()
+    part1 = simulate_pop(pop, days=80, i=0)
+    part2 = simulate_pop(pop, days=256 - 80, i=80 % 9)
+    # t3 = perf_counter_ns()
+    # print(f'pop = ... :: {t2 - t1}')
+    # print(f'algo(...) :: {t3 - t2}')
     print(part1, part2, sep='\n')
