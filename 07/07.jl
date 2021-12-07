@@ -12,7 +12,7 @@ function centroid(vec::Vector{<:Real}; weight_fun::Function)::Int
 	return min_
 end
 
-part1(vec) = centroid(vec, weight_fun=n -> n)
+part1(vec) = sum(abs.(vec .- round(Int, mean(vec))))
 part2(vec) = centroid(vec, weight_fun=n -> sum(1:n))
 
 vec = readInput("input.txt")
