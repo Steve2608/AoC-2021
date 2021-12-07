@@ -17,6 +17,10 @@ out/
 *__pycache__*
 *.pyc
 *.pyo
+# Cython
+*build/
+*.so
+*.c
 
 ### AoC ###
 
