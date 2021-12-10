@@ -100,11 +100,11 @@ def part2(lines: list[tuple[str, str]]) -> int:
 if __name__ == '__main__':
     if __debug__:
         with open('example.txt') as in_file:
-            lines = list(map(lambda line: tuple(line.rstrip().split(' | ')), in_file.readlines()))
+            lines = list(map(lambda line: tuple(line.rstrip().split(' | ')), in_file))
         assert part1(lines) == 26, f'{part1(lines)=} != 26'
         assert part2(lines) == 61229, f'{part2(lines)=} != 61229'
 
     with open('input.txt') as in_file:
-        lines = list(map(lambda line: tuple(line.rstrip().split(' | ')), in_file.readlines()))
+        lines = list(map(lambda line: tuple(line.rstrip().split(' | ')), in_file))
     print(part1(lines))
     print(part2(lines))
