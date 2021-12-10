@@ -6,6 +6,13 @@ def part1(lines: list[tuple[str, str]]) -> int:
 
 
 def part2(lines: list[tuple[str, str]]) -> int:
+    class iSet(set):
+        def unset(self):
+            if len(self) == 1:
+                return next(iter(self))
+            else:
+                raise ValueError(self)
+
     light_to_number = {
         tuple('abcefg'): 0,
         tuple('cf'): 1,
@@ -19,8 +26,8 @@ def part2(lines: list[tuple[str, str]]) -> int:
         tuple('abcdfg'): 9,
     }
 
-    def deduce_by_length(numbers: list[str]) -> dict[str, set[str]]:
-        random = {k: set('abcdefg') for k in 'abcdefg'}
+    def deduce_by_length(numbers: list[str]) -> dict[str, iSet[str]]:
+        random = {k: iSet('abcdefg') for k in 'abcdefg'}
 
         for num in map(set, numbers):
             if len(num) == 2:
@@ -54,21 +61,21 @@ def part2(lines: list[tuple[str, str]]) -> int:
                 pass
         return random
 
-    def deduction(assignment: dict[str, set[str]]) -> dict[str, set[str]]:
+    def deduction(assignment: dict[str, iSet[str]]) -> dict[str, iSet[str]]:
         changed = True
         while changed:
             changed = False
             for k, v in assignment.items():
                 if len(v) == 1:
-                    v_ = next(iter(v))
+                    v_ = v.unset()
                     for k_ in filter(lambda k_: k_ != k, assignment):
                         if v_ in assignment[k_]:
                             changed = True
                             assignment[k_].discard(v_)
         return assignment
 
-    def inverse_assignment(assignment: dict[str, set[str]]) -> dict[str, str]:
-        return {next(iter(v)): k for k, v in assignment.items()}
+    def inverse_assignment(assignment: dict[str, iSet[str]]) -> dict[str, str]:
+        return {v.unset(): k for k, v in assignment.items()}
 
     def construct_number(assignment: dict[str, str], numbers: list[str]) -> int:
         sum_ = 0
