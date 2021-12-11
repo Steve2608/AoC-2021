@@ -11,14 +11,14 @@ function print_matrix(mat::Matrix{Int})
     println()
 end
 
-function flash(mat::Matrix{Int})::Tuple{Matrix{Int}, Matrix{Bool}}
+function flash(mat::Matrix{Int}, flashing_at::Int)::Tuple{Matrix{Int}, Matrix{Bool}}
     w, h = size(mat)
     is_flashing = fill(false, w, h)
     s_old, s_new = -1, sum(is_flashing)
     while s_old != s_new
         for i = 1:h
             for j = 1:w
-                if mat[i, j] > 9 && !is_flashing[i, j]
+                if mat[i, j] > flashing_at && !is_flashing[i, j]
                     y_min = max(1, j - 1)
                     y_max = min(w, j + 1)
                     x_min = max(1, i - 1)
@@ -36,34 +36,34 @@ function flash(mat::Matrix{Int})::Tuple{Matrix{Int}, Matrix{Bool}}
     return mat, is_flashing
 end
 
-function part1(mat::Matrix{Int}; steps::Int = 100)::Int
+function part1(mat::Matrix{Int}; steps::Int = 100, flashing_at::Int = 9)::Int
     n_flashes = 0
     mat = deepcopy(mat)
     for _ in 1:steps
         mat .+= 1
         
-        mat, _ = flash(mat)
+        mat, _ = flash(mat, flashing_at)
 
-        n_flashes += sum(mat .> 9)
-        mat[mat .> 9] .= 0
+        n_flashes += sum(mat .> flashing_at)
+        mat[mat .> flashing_at] .= 0
     end
 
     return n_flashes
 end
 
-function part2(mat::Matrix{Int})::Int
+function part2(mat::Matrix{Int}; flashing_at::Int = 9)::Int
     mat = deepcopy(mat)
     i = 1
     while true
         mat .+= 1
         
-        mat, is_flashing = flash(mat)
+        mat, is_flashing = flash(mat, flashing_at)
 
         if all(is_flashing)
             return i
         end
 
-        mat[mat .> 9] .= 0
+        mat[mat .> flashing_at] .= 0
         i += 1
     end
 end
