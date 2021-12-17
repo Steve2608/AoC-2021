@@ -1,9 +1,10 @@
+from math import ceil, sqrt
 import re
 
 
 def part1(y_min: int) -> int:
     n = abs(y_min) - 1
-    return n * (n + 1) // 2
+    return n * (n + 1) >> 1
 
 
 def part2(x_min: int, x_max: int, y_min: int, y_max: int) -> int:
@@ -24,11 +25,14 @@ def part2(x_min: int, x_max: int, y_min: int, y_max: int) -> int:
     
     def both(x, y) -> bool:
         return x and y
+    
+    def inverse_gaussian_sum(m: int):
+        return ceil((-1 + sqrt(1 + m << 3)) / 2)
 
     # clever brute force
     return sum(
-        sum(any(map(both, generate_x(x), generate_y(y))) for x in range(x_max + 1)) 
-        for y in range(y_min, -y_min)
+        sum(any(map(both, generate_x(x), generate_y(y))) for y in range(y_min, -y_min))
+        for x in range(inverse_gaussian_sum(x_min), x_max + 1)
     )
 
 
