@@ -14,13 +14,12 @@ def map_beacons(scanners_text: list[str], min_match: int = 12) -> set[tuple[int,
         for x_dir, y_dir, z_dir in it.product((1, -1), repeat=3):
             for i_x, i_y, i_z in it.permutations((0, 1, 2)):
                 counts = defaultdict(int)
-                for coord in target:
-                    for x, y, z in already_mapped:
-                        x_new = x + x_dir * coord[i_x]
-                        y_new = y + y_dir * coord[i_y]
-                        z_new = z + z_dir * coord[i_z]
+                for coord, (x, y, z) in it.product(target, already_mapped):
+                    x_new = x + x_dir * coord[i_x]
+                    y_new = y + y_dir * coord[i_y]
+                    z_new = z + z_dir * coord[i_z]
 
-                        counts[(x_new, y_new, z_new)] += 1
+                    counts[(x_new, y_new, z_new)] += 1
 
                 if counts[(scanner_pos := max(counts, key=counts.get))] >= min_match:
                     x, y, z = scanner_pos
