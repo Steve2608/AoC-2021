@@ -16,19 +16,19 @@ function readInput(filename::String)
     end
 end
 
-function pad_false(image, pad)
-    image_padded = falses(size(image) .+ pad*2)
-    image_padded[1+pad:end-pad, 1+pad:end-pad] .= image
-    return image_padded
-end
-
-function pad_true(image, pad)
-    image_padded = trues(size(image) .+ pad*2)
-    image_padded[1+pad:end-pad, 1+pad:end-pad] .= image
-    return image_padded
-end
-
 function step(line, image, pad_value; pad=2)
+    function pad_false(image, pad)
+        image_padded = falses(size(image) .+ pad*2)
+        image_padded[1+pad:end-pad, 1+pad:end-pad] .= image
+        return image_padded
+    end
+    
+    function pad_true(image, pad)
+        image_padded = trues(size(image) .+ pad*2)
+        image_padded[1+pad:end-pad, 1+pad:end-pad] .= image
+        return image_padded
+    end
+
     image_padded = pad_value ? pad_true(image, pad) : pad_false(image, pad)
     image_next = pad_value != line[1] ? trues(size(image_padded)) : falses(size(image_padded))
 
@@ -80,7 +80,6 @@ if args["example"]
     @assert sum_image50 == 3351;
 end
 
-# problem
 line, image = readInput("input.txt");
 
 image2, sum_image2 = multiple_steps(line, image, steps=2, pad_even=true);
