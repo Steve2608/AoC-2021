@@ -8,7 +8,7 @@ def to_coordinate_pairs(line):
     return ((a, b + 1), (c, d + 1), (e, f + 1))
 
 
-def part2(cubes: dict):
+def part2(cubes: dict) -> int:
     def get_slice(p: tuple[int, int], ps: np.ndarray):
         start, stop = np.searchsorted(ps, p)
         return slice(start, stop)
@@ -29,12 +29,13 @@ def part2(cubes: dict):
         x_, y_, z_ = get_slice(x, xs), get_slice(y, ys), get_slice(z, zs)
         states[x_, y_, z_] = s
 
-    return np.sum(sizes[states])
+    return int(np.sum(sizes[states]))
 
 
-def part1(cubes: dict):
+def part1(cubes: dict) -> int:
     cubes = {
         ((a, b), (c, d), (e, f)): on for ((a, b), (c, d), (e, f)), on in cubes.items()
+        # end-exclusive: 51
         if all(abs(x) <= 50 for x in (a, c, e)) and all(abs(x) <= 51 for x in (b, d, f))
     }
 
