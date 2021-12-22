@@ -14,13 +14,13 @@ def part2(cubes: dict):
         return slice(start, stop)
 
     # find boundaries per axis (segments)
-    xs, ys, zs = map(lambda n: n.astype(np.int64), map(np.unique, zip(*cubes)))
+    xs, ys, zs = map(np.unique, zip(*cubes))
 
     # find distances per axis (segments)
-    xd, yd, zd = map(lambda n: n.astype(np.int64), map(np.diff, (xs, ys, zs)))
+    xd, yd, zd = map(np.diff, (xs, ys, zs))
     
     # find size per segment
-    sizes = np.einsum('i,j,k -> ijk', xd, yd, zd).astype(np.int64)
+    sizes = np.einsum('i,j,k -> ijk', xd, yd, zd, dtype=np.int64)
     
     # initialize all with turned-off
     state = np.zeros_like(sizes, dtype=bool)
