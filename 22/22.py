@@ -23,13 +23,13 @@ def part2(cubes: dict):
     sizes = np.einsum('i,j,k -> ijk', xd, yd, zd, dtype=np.int64)
     
     # initialize all with turned-off
-    state = np.zeros_like(sizes, dtype=bool)
+    states = np.zeros_like(sizes, dtype=bool)
 
     for (x, y, z), s in cubes.items():
         x_, y_, z_ = get_slice(x, xs), get_slice(y, ys), get_slice(z, zs)
-        state[x_, y_, z_] = s
+        states[x_, y_, z_] = s
 
-    return int(np.sum(sizes * state))
+    return np.sum(sizes[states])
 
 
 def part1(cubes: dict):
