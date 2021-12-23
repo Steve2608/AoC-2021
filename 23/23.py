@@ -1,4 +1,5 @@
 from functools import partial
+from queue import PriorityQueue
 
 
 def parse_board(filename: str):
@@ -14,39 +15,28 @@ def parse_board(filename: str):
     return board
 
 
-def dijkstra(board: list[str]):
+def UCS(board: list[str], target):
     def key(board: list[str]):
         return tuple(board)
 
-    def is_room(board: list[str], i: int):
-        return len(board[i]) > 1
-
-    def can_move(board: list[str], src: int, dest: int):
-        a = min(src, dest)
-        b = max(src, dest)
-        return not any(i != src and i not in goal_spaces and board[i] != '.' for i in range(a, b+1))
-
-    def goal_or_empty(board: list[str], amphipod: str, dest: int):
-        room = board[dest]
-        n_amphipods = room.count(amphipod)
-        n_empty = room.count('.')
-        return len(room) == n_amphipods + n_empty
-
-    def get_amphipod(room: str):
-        # get first amphipod for room / hallway 
+    def get_first_amphipod(room: str):
+        # get first amphipod for room / hallway
         for c in room:
             if c != '.':
                 return c
 
-    def to_room(letter: str, room: str) -> tuple[str, int]:
-        n_empty = room.count('.')
-
-        assert n_empty != 0
-        room = list(room)
-        room[n_empty - 1] = letter
-        return ''.join(room), n_empty
-
     def possible_moves(board: list[str], src: int):
+        def can_move(board: list[str], src: int, dest: int):
+            a = min(src, dest)
+            b = max(src, dest)
+            return not any(i != src and i not in goal_spaces and board[i] != '.' for i in range(a, b+1))
+        
+        def goal_or_empty(board: list[str], amphipod: str, dest: int):
+            room = board[dest]
+            n_amphipods = room.count(amphipod)
+            n_empty = room.count('.')
+            return len(room) == n_amphipods + n_empty
+
         amphipod = board[src]
         
         # if on hallway
@@ -61,7 +51,7 @@ def dijkstra(board: list[str]):
             return []
 
         # in room
-        amphipod = get_amphipod(amphipod)
+        amphipod = get_first_amphipod(amphipod)
 
         # room is already complete
         if src == goals[amphipod] and goal_or_empty(board, amphipod, src):
@@ -78,12 +68,23 @@ def dijkstra(board: list[str]):
                 possible.append(dest)
         return possible
 
-    def move(board: list[str], pos: int, dest: int):
+    def move(board: tuple[str, ...], pos: int, dest: int):
+        def is_room(board: list[str], i: int):
+            return len(board[i]) > 1
+        
+        def to_room(letter: str, room: str) -> tuple[str, int]:
+            n_empty = room.count('.')
+
+            assert n_empty != 0
+            room = list(room)
+            room[n_empty - 1] = letter
+            return ''.join(room), n_empty
+        
         # copy board
-        new_board = board[:]
+        new_board = list(board)
         dist = 0
         
-        amphipod = get_amphipod(board[pos])
+        amphipod = get_first_amphipod(board[pos])
         if is_room(board, pos):
             room_old = board[pos]
             room_new = ''
@@ -120,9 +121,7 @@ def dijkstra(board: list[str]):
         'C': 6,
         'D': 8,
     }
-
     goal_spaces = set(goals.values())
-
     costs = {
         'A': 1,
         'B': 10,
@@ -130,35 +129,31 @@ def dijkstra(board: list[str]):
         'D': 1000,
     }
 
-    states = {key(board): 0}
-    queue = [board]
+    queue = PriorityQueue()
+    queue.put((0, key(board)))
+    seen = set()
 
     while queue:
-        board = queue.pop()
+        cost, board = queue.get()
+        if board in seen:
+            continue
+        if board == target:
+            return cost
+
+        seen.add(board)
         for pos, state in enumerate(board):
-            if get_amphipod(state):
-                dests = possible_moves(board, pos)
-
-                for dest in dests:
+            # if state has an amphipod
+            if get_first_amphipod(state):
+                for dest in possible_moves(board, pos):
                     new_board, move_cost = move(board, pos, dest)
-                    new_cost = states[key(board)] + move_cost
-
-                    # maximum upper bound if state not yet encountered
-                    cost = states.get(new_key := key(new_board), float('Inf'))
-                    if new_cost < cost:
-                        states[new_key] = new_cost
-                        queue.append(new_board)
-
-    return states
+                    if (b := key(new_board)) not in seen:
+                        queue.put((cost + move_cost, b))
+    
+    raise ValueError(f'UCS did not find {target=}') 
 
 
-def get_costs(board: list[str], target: tuple[str]):
-    nodes = dijkstra(board)
-    return nodes.get(target, -1)
-
-
-part1 = partial(get_costs, target=('.', '.', 'A'*2, '.', 'B'*2, '.', 'C'*2, '.', 'D'*2, '.', '.'))
-part2 = partial(get_costs, target=('.', '.', 'A'*4, '.', 'B'*4, '.', 'C'*4, '.', 'D'*4, '.', '.'))
+part1 = partial(UCS, target=('.', '.', 'A'*2, '.', 'B'*2, '.', 'C'*2, '.', 'D'*2, '.', '.'))
+part2 = partial(UCS, target=('.', '.', 'A'*4, '.', 'B'*4, '.', 'C'*4, '.', 'D'*4, '.', '.'))
 
 
 if __name__ == '__main__':
