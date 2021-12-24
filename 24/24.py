@@ -20,27 +20,27 @@ def solve(code: list[list[str]]):
             if inst[0] == 'inp':
                 reg[inst[1]] = next(input_iter)
             else:
-            instr, a, b = inst
+                instr, a, b = inst
                 b = reg[b] if b in reg else int(b)
                 c = int64(name=f'v_{i}')
             
-            if instr == 'add':
-                    solver.add(c == reg[a] + b)
-            elif instr == 'mul':
-                    solver.add(c == reg[a] * b)
-            elif instr == 'mod':
-                    solver.add(c == reg[a] % b)
-            elif instr == 'div':
-                    solver.add(c == reg[a] / b)
-            elif instr == 'eql':
-                    solver.add(c == z3.If(reg[a] == b, one, zero))
-            else:
-                raise ValueError(f'Invalid state: {instr}')
+                if instr == 'add':
+                        solver.add(c == reg[a] + b)
+                elif instr == 'mul':
+                        solver.add(c == reg[a] * b)
+                elif instr == 'mod':
+                        solver.add(c == reg[a] % b)
+                elif instr == 'div':
+                        solver.add(c == reg[a] / b)
+                elif instr == 'eql':
+                        solver.add(c == z3.If(reg[a] == b, one, zero))
+                else:
+                    raise ValueError(f'Invalid state: {instr}')
 
                 reg[a] = c
 
-        # finally z needs to be
-        solver.add(reg['z'] == 0)
+        # finally z needs to be 0
+        solver.add(reg['z'] == zero)
 
     def parse_result(model) -> int:
         return int(''.join(map(str, (model[d] for d in inp_digits))))
@@ -56,7 +56,7 @@ def solve(code: list[list[str]]):
     add_program_constraints(solver, inp_digits)
 
     # formulate input
-        inp = sum((10 ** i) * d for i, d in enumerate(inp_digits[::-1]))
+    inp = sum((10 ** i) * d for i, d in enumerate(inp_digits[::-1]))
     for optimize in (solver.maximize, solver.minimize):
         solver.push()
         optimize(inp)
