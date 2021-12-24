@@ -1,68 +1,69 @@
+from functools import partial
+
 import z3
 
 
 def solve(code: list[list[str]]):
+    int64 = partial(z3.BitVec, bv=64)
+    int64val = partial(z3.BitVecVal, bv=64)
+
     def encode_digits(solver):
-        inp_digits = [z3.BitVec(f'd_{i}', 64) for i in range(14)]
-        for d in inp_digits:
-            solver.add(1 <= d)
-            solver.add(d <= 9)
-        return inp_digits
+        inp = [int64(name=f'd_{i}') for i in range(14)]
+        for d in inp:
+            solver.add(z3.And(1 <= d, d <= 9))
+        return inp
 
     def add_program_constraints(solver, digits):
-        digit_input = iter(digits)
+        input_iter = iter(digits)
         for i, inst in enumerate(code):
             # read input
             if inst[0] == 'inp':
-                registers[inst[1]] = next(digit_input)
-                continue
-
+                reg[inst[1]] = next(input_iter)
+            else:
             instr, a, b = inst
-            b = registers[b] if b in registers else int(b)
-            c = z3.BitVec(f'v_{i}', 64)
+                b = reg[b] if b in reg else int(b)
+                c = int64(name=f'v_{i}')
             
             if instr == 'add':
-                solver.add(c == registers[a] + b)
+                    solver.add(c == reg[a] + b)
             elif instr == 'mul':
-                solver.add(c == registers[a] * b)
+                    solver.add(c == reg[a] * b)
             elif instr == 'mod':
-                solver.add(c == registers[a] % b)
+                    solver.add(c == reg[a] % b)
             elif instr == 'div':
-                solver.add(c == registers[a] / b)
+                    solver.add(c == reg[a] / b)
             elif instr == 'eql':
-                solver.add(c == z3.If(registers[a] == b, one, zero))
+                    solver.add(c == z3.If(reg[a] == b, one, zero))
             else:
                 raise ValueError(f'Invalid state: {instr}')
 
-            registers[a] = c
+                reg[a] = c
 
         # finally z needs to be
-        solver.add(registers['z'] == 0)
+        solver.add(reg['z'] == 0)
 
-    solver = z3.Optimize()
+    def parse_result(model) -> int:
+        return int(''.join(map(str, (model[d] for d in inp_digits))))
     
     # constants
-    zero, one = z3.BitVecVal(0, 64), z3.BitVecVal(1, 64)
-    registers = {v: zero for v in 'xyzw'}
+    zero, one = int64val(0), int64val(1)
+    reg = {v: zero for v in 'xyzw'}
+    solver = z3.Optimize()
 
     # input constraints
     inp_digits = encode_digits(solver)
     # constraints by code
     add_program_constraints(solver, inp_digits)
 
-    for func in (solver.maximize, solver.minimize):
-        solver.push()
-
-        # construct input
+    # formulate input
         inp = sum((10 ** i) * d for i, d in enumerate(inp_digits[::-1]))
+    for optimize in (solver.maximize, solver.minimize):
+        solver.push()
+        optimize(inp)
         
-        # fit to func
-        func(inp)
+        # 'run' solver
+        yield parse_result(solver.model()) if solver.check() else None
         
-        # if solver is satisfyable
-        if solver.check():
-            m = solver.model()
-            yield ''.join(str(m[d]) for d in inp_digits)
         solver.pop()
 
 
